@@ -64,7 +64,6 @@
 			</Item>
 			<Item Name="Periodic Spot Pattern Parameters2.ctl" Type="VI" URL="../Periodic Spot Pattern Parameters2.ctl"/>
 			<Item Name="Launch DS Server if Local URL.vi" Type="VI" URL="../../../../../../Program Files (x86)/National Instruments/LabVIEW 2011/examples/comm/datasktcore.llb/Launch DS Server if Local URL.vi"/>
-			<Item Name="pytscript.dll" Type="Document"/>
 		</Item>
 		<Item Name="Build Specifications" Type="Build"/>
 	</Item>
