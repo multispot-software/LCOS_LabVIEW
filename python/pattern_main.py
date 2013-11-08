@@ -2,8 +2,8 @@ from numpy import array
 from patternlib_simple import get_spot_pattern
 
 
-def pattern_wrapper(Xm, Ym, f, wl, phi0, phase_factor, center_spot, darken_cspot, 
-                lw, vmax, ph_wrapping, pad, dark_all, nospot):
+def pattern_wrapper(Xm, Ym, f, wl, phi0, phase_factor, center_spot, 
+                    darken_cspot, lw, vmax, ph_wrapping, pad, dark_all, nospot):
     """
     Wrapper function to generate the pattern using input parameters from LV.
     

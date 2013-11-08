@@ -1,4 +1,5 @@
-from numpy import atleast_2d, array, zeros, ones, bool, concatenate, mgrid, mean, diff, isnan, ceil, floor, uint8, sqrt
+from numpy import (atleast_2d, array, zeros, ones, bool, concatenate, mgrid, 
+                   mean, diff, isnan, ceil, floor, uint8, sqrt)
 
 LCOS_X_SIZE, LCOS_Y_SIZE, LCOS_PIX_SIZE = 800, 600, 20e-6
 YL, XL = mgrid[:LCOS_Y_SIZE,:LCOS_X_SIZE]
