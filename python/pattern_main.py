@@ -1,6 +1,15 @@
 import numpy as np
 from patternlib_simple import get_spot_pattern
 
+def fprint(s):
+    with open(r"C:\Data\Antonio\software\LCOS\python_out.txt", "a") as myfile:
+        myfile.write(str(s)+'\n')
+
+def fprint_kw(**kwargs):
+    with open(r"C:\Data\Antonio\software\LCOS\python_out.txt", "a") as myfile:
+        s = ', '.join([k +'='+str(v) for k,v in kwargs.iteritems()])
+        myfile.write(s+'\n')
+
 
 def pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
                     darken_cspot, lw, vmax, ph_wrapping, pad, dark_all, nospot):
@@ -29,8 +38,16 @@ def pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
     Xm, Ym = np.array(Xm), np.array(Ym)
     lens_params = dict(wl=wl, f=f, phi_max=phi_max, phase_factor=phase_factor,
                        ph_wrapping=bool(ph_wrapping))
-    steer_params = dict(vmax=vmax, lw=lw, horizontal=True)
-    a = get_spot_pattern(Xm,Ym, lens_params, steer_params, pad=pad,
+    steer_params = dict(vmax=int(vmax), lw=int(lw), horizontal=True)
+
+    fprint('')
+    fprint_kw(**lens_params)
+    fprint_kw(**steer_params)
+    fprint_kw(pad=pad,
+              darken_cspot=darken_cspot, CD=(0, center_spot),
+              dark_all=dark_all, nospot=nospot)
+    #a = (np.arange(800*600).reshape(800, 600).T*255./(800*600)).tolist()
+    a = get_spot_pattern(Xm, Ym, lens_params, steer_params, pad=pad,
                         darken_cspot=darken_cspot, CD=(0, center_spot),
                         dark_all=dark_all, nospot=nospot)
     a = a.tolist()

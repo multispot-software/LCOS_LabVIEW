@@ -31,3 +31,6 @@ a = pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
                     darken_cspot, lw, vmax, ph_wrapping, pad, dark_all, nospot)
 
 s = 'test'
+
+import numpy as np
+a = (np.arange(800*600).reshape(800, 600).T*255./(800*600)).tolist()
