@@ -34,6 +34,7 @@
 		<Item Name="Update LCOS Image.vi" Type="VI" URL="../Update LCOS Image.vi"/>
 		<Item Name="mulitspot_pattern_static3.vi" Type="VI" URL="../mulitspot_pattern_static3.vi"/>
 		<Item Name="mulitspot_pattern_static3_session.vi" Type="VI" URL="../mulitspot_pattern_static3_session.vi"/>
+		<Item Name="test_mulitspot_pattern_static3_session.vi" Type="VI" URL="../test_mulitspot_pattern_static3_session.vi"/>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="vi.lib" Type="Folder">
 				<Item Name="Image Type" Type="VI" URL="/&lt;vilib&gt;/vision/Image Controls.llb/Image Type"/>
@@ -88,6 +89,7 @@
 				<Item Name="PYTHON Set Script Text__ogtk.vi" Type="VI" URL="/&lt;userlib&gt;/_OpenG.lib/labpython/labpython.llb/PYTHON Set Script Text__ogtk.vi"/>
 				<Item Name="PYTHON New Session__ogtk.vi" Type="VI" URL="/&lt;userlib&gt;/_OpenG.lib/labpython/labpython.llb/PYTHON New Session__ogtk.vi"/>
 				<Item Name="PYTHON Close Session__ogtk.vi" Type="VI" URL="/&lt;userlib&gt;/_OpenG.lib/labpython/labpython.llb/PYTHON Close Session__ogtk.vi"/>
+				<Item Name="PYTHON Get Version and Types__ogtk.vi" Type="VI" URL="/&lt;userlib&gt;/_OpenG.lib/labpython/labpython.llb/PYTHON Get Version and Types__ogtk.vi"/>
 			</Item>
 			<Item Name="Init LCOS Menu.vi" Type="VI" URL="../Init LCOS Menu.vi"/>
 			<Item Name="nivision.dll" Type="Document" URL="nivision.dll">
