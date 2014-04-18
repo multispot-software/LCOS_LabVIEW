@@ -1,14 +1,5 @@
 import numpy as np
-from patternlib_simple import get_spot_pattern
-
-def fprint(s):
-    with open(r"C:\Data\Antonio\software\LCOS\python_out.txt", "a") as myfile:
-        myfile.write(str(s)+'\n')
-
-def fprint_kw(**kwargs):
-    with open(r"C:\Data\Antonio\software\LCOS\python_out.txt", "a") as myfile:
-        s = ', '.join([k +'='+str(v) for k,v in kwargs.iteritems()])
-        myfile.write(s+'\n')
+from patternlib_simple import get_spot_pattern, fprint, fprint_kw
 
 
 def pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
@@ -41,6 +32,7 @@ def pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
     steer_params = dict(vmax=int(vmax), lw=int(lw), horizontal=True)
 
     fprint('')
+    fprint_kw(Xm=Xm, Ym=Ym)
     fprint_kw(**lens_params)
     fprint_kw(**steer_params)
     fprint_kw(pad=pad,

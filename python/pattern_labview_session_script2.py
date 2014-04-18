@@ -1,8 +1,32 @@
-import numpy as np
+"""
+The following variables must be set in the session before running the script.
 
+Arguments:
+    Xm (float array): X position of the spots in LOCOS coordinates
+    Ym (float array): Y posiition of the spots in LOCOS coordinates
+    phi_max (int): phi_max*pi is the max phase delay of the pattern reached
+        at the center of each spot. This is the initial phase set as maximum
+        but the max can wrap down to a lower value.
+    wl (float): laser wavelength (in m)
+    f (float): single-spot lens focal length (in m)
+    phase_factor (int, 0..255): 8bit level correspondic to a phase of pi
+    dark_spot (int): spot number of a spot to hide
+    darken (bool): if True hides spot `dark_spot`
+    lw (int): line-width of the steering pattern
+    vmax (int, 0..255): max level fot the steering pattern
+    PhWrap (bool): if True wrap the phase above 2*pi
+    pad (int): how many pixel of padding to leave around the spot pattern
+        before stating the steerring pattern
+    dark_all (bool): make a black pattern
+    nospot (bool): pattern with no spot (the pattern can have a steering
+        pattern)
+"""
+
+import numpy as np
 
 LCOS_X_SIZE, LCOS_Y_SIZE, LCOS_PIX_SIZE = 800, 600, 20e-6
 YL, XL = np.mgrid[:LCOS_Y_SIZE,:LCOS_X_SIZE]
+
 
 is_odd = lambda x: bool(x & 1)
 
@@ -165,42 +189,58 @@ def get_spot_pattern(Xm,Ym, lens_params, steer_params, pad=2, CD=(0,4),
         a[mask] = ad[mask]
     return a
 
-if __name__ == "__main__":
-    lens_params = dict(wl=532e-9, f=32e-3, phi_max=4, phase_factor=65,
-                       ph_wrapping=False)
-    steer_params = dict(vmax=120, lw=1, horizontal=True)
-    Xm = np.array([  23.87  ,   46.99  ,   70.1875,   93.4175,  116.6275,
-                   139.6825,  162.715 ,  185.765 ])
-    Ym = np.array([ 15.5825,  15.56  ,  15.5875,  15.595 ,  15.5225,  15.545 ,
-                   15.5125,  15.47  ])
 
-    #ym = r_[21.72,  44.87,  68.20,  91.45, 114.72, 137.87, 160.97, 184.04]
-    #ym = r_[13.84,  13.78,  13.79,  13.83,  13.75,  13.79,  13.74,  13.68]
+def pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
+                    darken_cspot, lw, vmax, ph_wrapping, pad, dark_all, nospot):
+    """
+    Wrapper function to generate the pattern using input parameters from LV.
+
+    Parameters:
+    `Xm`, `Ym`: 2D arrays of spot centers
+    `f`: (float) focal length of generated lenses (m)
+    `wl`: (float)wavelength of laser (m)
+    `phi_max`: (float) constant phase to add to the pattern (in pi units)
+    `phase_factor`: (uint8) the 8-bit value (grey scale) corresponding to pi
+    `center_spot`: spot number considered as center
+    `darken_cspot`: (bool) if True darken the center spot
+    `lw`: (uint) line-width of the steering pattern
+    `vmax` (uint8) max value for the steering pattern (min value is 0)
+    `ph_wrapping`: (uint8) if "true" wraps all the phase values < 0 to 0..2pi
+    `pad`: (uint) #pixels of padding for the lens pattern
+    `dark_all` (uint8) if "true" return an array of zeros
+    `nospot` (uint8) if "true" return only the steering pattern
+    """
+    if lw < 0: # avoids divisions by zero
+        lw = 1
+        vmax = 0
+
+    Xm, Ym = np.array(Xm), np.array(Ym)
+    lens_params = dict(wl=wl, f=f, phi_max=phi_max, phase_factor=phase_factor,
+                       ph_wrapping=bool(ph_wrapping))
+    steer_params = dict(vmax=int(vmax), lw=int(lw), horizontal=True)
+
+    fprint('')
+    fprint_kw(Xm=Xm, Ym=Ym)
+    fprint_kw(**lens_params)
+    fprint_kw(**steer_params)
+    fprint_kw(pad=pad,
+              darken_cspot=darken_cspot, CD=(0, center_spot),
+              dark_all=dark_all, nospot=nospot)
+    #a = (np.arange(800*600).reshape(800, 600).T*255./(800*600)).tolist()
+    a = get_spot_pattern(Xm, Ym, lens_params, steer_params, pad=pad,
+                        darken_cspot=darken_cspot, CD=(0, center_spot),
+                        dark_all=dark_all, nospot=nospot)
+    a = a.tolist()
+    return a
 
 
-    ## 2D Pattern
-    #Xm = vstack((xm,xm)) + LCOS_X_SIZE/2.
-    #Ym = vstack((ym,ym+23)) + LCOS_Y_SIZE/2.
 
-    ## 1D  vertical pattern
-    #Xm = array([[400],[405]])
-    #Ym = array([[300], [350]])
+a = pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
+                    darken_cspot, lw, vmax, ph_wrapping, pad, dark_all, nospot)
 
-    ## 1D  horizontal pattern
-    #Xm = array([[400, 450]])
-    #Ym = array([[250, 255]])
+s = 'test'
 
-    #XM, YM = atleast_2d(Xm), atleast_2d(Ym)
-    a = get_spot_pattern(Xm,Ym, lens_params, steer_params, pad=2, darken_cspot=0)
 
-#    C = get_spot_limits(XM,YM)
-#    a = pattern_sep(XM,YM,C, **pattern_params)
-#    a[a>255] = 255
-#    a[a<0] = 0
-#    a = a.astype(uint8)
-#
-#    ad = get_steer_pattern(vmax=120, lw=1, horizontal=1)
-#    mask = get_outer_mask(C, pad=2)
-#    grad = get_outer_mask(C, pad=12, sigma=5)
-#    ad *= grad
-#    a[mask] = ad[mask]
+
+#import numpy as np
+#a = (np.arange(800*600).reshape(800, 600).T*255./(800*600)).tolist()

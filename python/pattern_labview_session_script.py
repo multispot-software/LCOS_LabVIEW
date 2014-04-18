@@ -23,7 +23,9 @@ Arguments:
 """
 
 import sys
-sys.path.insert(0, "C:/Data/Antonio/software/LCOS/LCOS_CompleteLV/python/")
+PATH = "C:/Data/Antonio/software/LCOS/LCOS_CompleteLV/python"
+if PATH not in sys.path:
+    sys.path.insert(0, PATH)
 
 from pattern_main import pattern_wrapper
 
@@ -32,5 +34,5 @@ a = pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
 
 s = 'test'
 
-import numpy as np
-a = (np.arange(800*600).reshape(800, 600).T*255./(800*600)).tolist()
+#import numpy as np
+#a = (np.arange(800*600).reshape(800, 600).T*255./(800*600)).tolist()
