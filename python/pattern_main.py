@@ -2,7 +2,7 @@ import numpy as np
 from patternlib_simple import get_spot_pattern
 
 
-def pattern_wrapper(Xm, Ym, f, wl, phi0, phase_factor, center_spot,
+def pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
                     darken_cspot, lw, vmax, ph_wrapping, pad, dark_all, nospot):
     """
     Wrapper function to generate the pattern using input parameters from LV.
@@ -11,7 +11,7 @@ def pattern_wrapper(Xm, Ym, f, wl, phi0, phase_factor, center_spot,
     `Xm`, `Ym`: 2D arrays of spot centers
     `f`: (float) focal length of generated lenses (m)
     `wl`: (float)wavelength of laser (m)
-    `phi0`: (float) constant phase to add to the pattern (in pi units)
+    `phi_max`: (float) constant phase to add to the pattern (in pi units)
     `phase_factor`: (uint8) the 8-bit value (grey scale) corresponding to pi
     `center_spot`: spot number considered as center
     `darken_cspot`: (bool) if True darken the center spot
@@ -27,7 +27,7 @@ def pattern_wrapper(Xm, Ym, f, wl, phi0, phase_factor, center_spot,
         vmax = 0
 
     Xm, Ym = np.array(Xm), np.array(Ym)
-    lens_params = dict(wl=wl, f=f, phi0=phi0, phase_factor=phase_factor,
+    lens_params = dict(wl=wl, f=f, phi_max=phi_max, phase_factor=phase_factor,
                        ph_wrapping=bool(ph_wrapping))
     steer_params = dict(vmax=vmax, lw=lw, horizontal=True)
     a = get_spot_pattern(Xm,Ym, lens_params, steer_params, pad=pad,

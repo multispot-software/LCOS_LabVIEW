@@ -84,7 +84,7 @@ def single_pattern(xm, ym, mask=None, a=None, phi_max=0, f=30e-3, wl=532e-9):
 def pattern_sep(X, Y, C, phi_max, f=30e-3, wl=532e-9, phase_factor=1,
                 ph_wrapping=False, clip=True, dtype=np.uint8):
     """Pattern for spots centered in X,Y and rectangular limits defined in C.
-    `phi0`: constant phase added to the pattern (in pi units)
+    `phi_max`: constant phase added to the pattern (in pi units)
     `f`: focal length of generated lenses (m)
     `wl`: wavelength of laser
     `phase_factor`: (uint8) the 8-bit value (grey scale) corresponding to pi
