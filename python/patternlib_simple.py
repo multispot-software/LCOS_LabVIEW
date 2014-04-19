@@ -29,10 +29,11 @@ def get_steer_pattern(lw=20, vmax=255, horizontal=True):
     """
     a = np.zeros((LCOS_Y_SIZE,LCOS_X_SIZE), dtype=np.uint8)
     if vmax > 0:
-        fprint_kw(lw_pos_assert=(lw > 0))
+        fprint_kw(lw_pos_assert=(lw > 0), horizontal=horizontal)
         assert lw > 0
-        for v in range(LCOS_Y_SIZE):
-                if is_odd(v/lw): a[v] = vmax
+        ai = a if horizontal else a.T
+        for i, line in enumerate(ai):
+            if is_odd(i/lw): line[:] = vmax
     return a
 
 def get_spot_limits(X, Y):
@@ -168,7 +169,7 @@ def get_spot_pattern(Xm,Ym, lens_params, steer_params, pad=2, CD=(0,4),
 if __name__ == "__main__":
     lens_params = dict(wl=532e-9, f=32e-3, phi_max=4, phase_factor=65,
                        ph_wrapping=False)
-    steer_params = dict(vmax=120, lw=1, horizontal=True)
+    steer_params = dict(vmax=120, lw=1, horizontal=False)
     Xm = np.array([  23.87  ,   46.99  ,   70.1875,   93.4175,  116.6275,
                    139.6825,  162.715 ,  185.765 ])
     Ym = np.array([ 15.5825,  15.56  ,  15.5875,  15.595 ,  15.5225,  15.545 ,

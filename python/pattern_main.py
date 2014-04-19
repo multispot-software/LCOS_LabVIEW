@@ -3,7 +3,8 @@ from patternlib_simple import get_spot_pattern, fprint, fprint_kw
 
 
 def pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
-                    darken_cspot, lw, vmax, ph_wrapping, pad, dark_all, nospot):
+                    darken_cspot, lw, vmax, ph_wrapping, pad, dark_all,
+                    nospot, steer_horiz):
     """
     Wrapper function to generate the pattern using input parameters from LV.
 
@@ -29,7 +30,7 @@ def pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
     Xm, Ym = np.array(Xm), np.array(Ym)
     lens_params = dict(wl=wl, f=f, phi_max=phi_max, phase_factor=phase_factor,
                        ph_wrapping=bool(ph_wrapping))
-    steer_params = dict(vmax=int(vmax), lw=int(lw), horizontal=True)
+    steer_params = dict(vmax=int(vmax), lw=int(lw), horizontal=steer_horiz)
 
     fprint('')
     fprint_kw(Xm=Xm, Ym=Ym)
