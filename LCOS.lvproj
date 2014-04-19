@@ -32,9 +32,9 @@
 		<Item Name="LCOS Parent Action.ctl" Type="VI" URL="../LCOS Parent Action.ctl"/>
 		<Item Name="Update Preview Image.vi" Type="VI" URL="../Update Preview Image.vi"/>
 		<Item Name="Update LCOS Image.vi" Type="VI" URL="../Update LCOS Image.vi"/>
-		<Item Name="mulitspot_pattern_static3.vi" Type="VI" URL="../mulitspot_pattern_static3.vi"/>
-		<Item Name="mulitspot_pattern_static3_session.vi" Type="VI" URL="../mulitspot_pattern_static3_session.vi"/>
-		<Item Name="test_mulitspot_pattern_static3_session.vi" Type="VI" URL="../test_mulitspot_pattern_static3_session.vi"/>
+		<Item Name="python_pattern_script_node.vi" Type="VI" URL="../python_pattern_script_node.vi"/>
+		<Item Name="python_pattern.vi" Type="VI" URL="../python_pattern.vi"/>
+		<Item Name="test_python_pattern.vi" Type="VI" URL="../test_python_pattern.vi"/>
 		<Item Name="Set LabPython Server Path.vi" Type="VI" URL="../Set LabPython Server Path.vi"/>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="vi.lib" Type="Folder">
