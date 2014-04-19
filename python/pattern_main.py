@@ -4,7 +4,7 @@ from patternlib_simple import get_spot_pattern, fprint, fprint_kw
 
 def pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
                     darken_cspot, lw, vmax, ph_wrapping, pad, dark_all,
-                    nospot, steer_horiz):
+                    nospot, steer_horiz, debug=False):
     """
     Wrapper function to generate the pattern using input parameters from LV.
 
@@ -32,17 +32,18 @@ def pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
                        ph_wrapping=bool(ph_wrapping))
     steer_params = dict(vmax=int(vmax), lw=int(lw), horizontal=steer_horiz)
 
-    fprint('')
-    fprint_kw(Xm=Xm, Ym=Ym)
-    fprint_kw(**lens_params)
-    fprint_kw(**steer_params)
-    fprint_kw(pad=pad,
-              darken_cspot=darken_cspot, CD=(0, center_spot),
-              dark_all=dark_all, nospot=nospot)
+    if debug:
+        fprint('')
+        fprint_kw(Xm=Xm, Ym=Ym)
+        fprint_kw(**lens_params)
+        fprint_kw(**steer_params)
+        fprint_kw(pad=pad,
+                  darken_cspot=darken_cspot, CD=(0, center_spot),
+                  dark_all=dark_all, nospot=nospot)
     #a = (np.arange(800*600).reshape(800, 600).T*255./(800*600)).tolist()
     a = get_spot_pattern(Xm, Ym, lens_params, steer_params, pad=pad,
                         darken_cspot=darken_cspot, CD=(0, center_spot),
-                        dark_all=dark_all, nospot=nospot)
+                        dark_all=dark_all, nospot=nospot, debug=debug)
     a = a.tolist()
     return a
 

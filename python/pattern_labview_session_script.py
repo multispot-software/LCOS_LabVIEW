@@ -21,6 +21,7 @@ Arguments:
     nospot (bool): pattern with no spot (the pattern can have a steering
         pattern)
     steer_horiz (bool): if True horizontal lines in steering, else vertical
+    debug (bool): if True prints debugging info to a file
 """
 
 import sys
@@ -32,7 +33,7 @@ from pattern_main import pattern_wrapper
 
 a = pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
                     darken_cspot, lw, vmax, ph_wrapping, pad, dark_all,
-                    nospot, steer_horiz)
+                    nospot, steer_horiz, debug=debug)
 
 s = 'test'
 
