@@ -4,6 +4,9 @@ import numpy as np
 LCOS_X_SIZE, LCOS_Y_SIZE, LCOS_PIX_SIZE = 800, 600, 20e-6
 YL, XL = np.mgrid[:LCOS_Y_SIZE, :LCOS_X_SIZE]
 
+def zeros_lcos(dtype=None):
+    return np.zeros((LCOS_Y_SIZE, LCOS_X_SIZE), dtype=dtype)
+
 is_odd = lambda x: bool(x & 1)
 
 def fprint(s):
@@ -83,8 +86,8 @@ def get_spot_limits(X, Y, debug=False):
 def phase_spherical(r, f, wl=532e-9):
     """Phase profile (in pi units) at distance r (x,y) from spot center
     for a spherical wave converging at a distance f from the screen.
-    Inputs in SI units. NOTE: This is equivalent to phase_exact()."""
-    return -(2/wl)*(np.sqrt(r**2+f**2)-f)
+    Inputs in SI units. The formal is exact, not approximated."""
+    return -(2/wl)*(np.sqrt(r**2 + f**2) - f)
 
 def single_pattern(xm, ym, mask=None, a=None, phi_max=0, f=30e-3, wl=532e-9):
     """Pattern for a single spot centered at (xm,ym) in LCOS pixel units.
@@ -92,12 +95,34 @@ def single_pattern(xm, ym, mask=None, a=None, phi_max=0, f=30e-3, wl=532e-9):
     `phi_max` is constant phase to add to the pattern (in pi units).
     `a` is an (optional) array in which to store the pattern.
     """
-    #if a is None: a = zeros((LCOS_Y_SIZE,LCOS_X_SIZE))
-    #if mask is None: mask = ones(a.shape, dtype=bool)
+    if a is None: a = zeros_lcos()
+    if mask is None: mask = np.ones(a.shape, dtype=bool)
     radius = lambda x,y: np.sqrt(x**2 + y**2)
     R = radius((XL[mask] - xm)*LCOS_PIX_SIZE, (YL[mask] - ym)*LCOS_PIX_SIZE)
     a[mask] = phi_max + phase_spherical(R, f=f, wl=wl)
     return a
+
+def single_pattern_steer(xm, ym, mask=None, a=None, phi_max=0, f=30e-3,
+                         wl=532e-9, steer_slope=None, steer_offset=0):
+    """Single spot lens and linear steering phase pattern (1 = pi).
+
+    Centered at (xm,ym) in LCOS pixel units.
+    The pattern is computed on the subset of LCOS pixels selected by mask.
+    `phi_max` is constant phase to add to the pattern (in pi units).
+    `a` is an (optional) array in which to store the pattern.
+    `steer_slope`: max linear phase (1 = pi) for spot steering may be < 0
+    """
+    if a is None: a = zeros_lcos()
+    if mask is None: mask = np.ones(a.shape, dtype=bool)
+    radius = lambda x,y: np.sqrt(x**2 + y**2)
+    R = radius((XL[mask] - xm)*LCOS_PIX_SIZE, (YL[mask] - ym)*LCOS_PIX_SIZE)
+    a[mask] = phi_max + phase_spherical(R, f=f, wl=wl)
+
+    if steer_slope is not None:
+        ycenter = 0.5*(YL[mask].max() + YL[mask].min())
+        a[mask] += (YL[mask] - ycenter)*steer_slope + steer_offset
+    return a
+
 
 def pattern_sep(X, Y, C, phi_max, f=30e-3, wl=532e-9, phase_factor=1,
                 ph_wrapping=False, clip=True, dtype=np.uint8, debug=False):
@@ -156,7 +181,7 @@ def get_spot_pattern(Xm, Ym, lens_params, steer_params, pad=2, CD=(0,4),
         CD (tuple): coordinates of the pixel considerred the center one
         darken_cspot (bool): if True darken the center spot
         dark_all (bool): if True return an array of zeros
-        nospot (bool): if True return only hte steering pattern
+        nospot (bool): if True return only the steering pattern
         debug (bool): if True prints debugging info to a file
     """
     steer_params.update(debug=debug)
