@@ -7,6 +7,13 @@ YL, XL = np.mgrid[:LCOS_Y_SIZE, :LCOS_X_SIZE]
 def zeros_lcos(dtype=None):
     return np.zeros((LCOS_Y_SIZE, LCOS_X_SIZE), dtype=dtype)
 
+class LCOS:
+    xsize = LCOS_X_SIZE
+    ysize = LCOS_Y_SIZE
+    pix_size = LCOS_PIX_SIZE
+    XL, YL = np.mgrid[:LCOS_Y_SIZE, :LCOS_X_SIZE]
+    zeros = zeros_lcos
+
 is_odd = lambda x: bool(x & 1)
 
 def fprint(s):
@@ -125,7 +132,8 @@ def single_pattern_steer(xm, ym, mask=None, a=None, phi_max=0, f=30e-3,
 
 
 def pattern_sep(X, Y, C, phi_max, f=30e-3, wl=532e-9, phase_factor=1,
-                ph_wrapping=False, clip=True, dtype=np.uint8, debug=False):
+                ph_wrapping=False, clip=True, dtype=np.uint8, debug=False,
+                steer_slope=None, steer_offset=0):
     """Pattern for spots centered in X,Y and rectangular limits defined in C.
 
     Arguments:
@@ -147,7 +155,10 @@ def pattern_sep(X, Y, C, phi_max, f=30e-3, wl=532e-9, phase_factor=1,
             xm, ym = X[iy, ix], Y[iy, ix]
             xmin, xmax, ymin, ymax = C[iy, ix]
             mask = (XL >= xmin)*(XL <= xmax)*(YL >= ymin)*(YL <= ymax)
-            single_pattern(xm, ym, mask=mask, a=a, phi_max=phi_max, f=f, wl=wl)
+            single_pattern_steer(xm, ym, mask=mask, a=a, phi_max=phi_max, f=f,
+                                 wl=wl,
+                                 steer_slope=steer_slope,
+                                 steer_offset=steer_offset)
     if ph_wrapping:
         a[a<0] = a[a<0] % phi_max
         if debug:
@@ -171,9 +182,11 @@ def get_outer_mask(C, pad=0):
     mask = mask.astype(bool)
     return mask
 
-def get_spot_pattern(Xm, Ym, lens_params, steer_params, pad=2, CD=(0,4),
+def get_spot_pattern2(XM, YM, C, lens_params, steer_params, pad=2, CD=(0,4),
                      darken_cspot=False, dark_all=False, nospot=False,
-                     debug=False):
+                     debug=False,
+                     steer_slope=None, steer_offset=0,
+                     ):
     """Return the pattern with the multi-spot lenses and the beam steering.
 
     Arguments:
@@ -188,17 +201,20 @@ def get_spot_pattern(Xm, Ym, lens_params, steer_params, pad=2, CD=(0,4),
     lens_params.update(debug=debug)
     if dark_all: return np.zeros((LCOS_Y_SIZE, LCOS_X_SIZE), dtype=np.uint8)
     if nospot: return get_steer_pattern(**steer_params)
-    Xm += LCOS_X_SIZE/2.
-    Ym += LCOS_Y_SIZE/2.
-    XM, YM = np.atleast_2d(Xm), np.atleast_2d(Ym)
-    if debug:
-        fprint_kw(XM_YM_shape_assert=(len(XM.shape) == len(YM.shape) == 2))
-        assert len(XM.shape) == len(YM.shape) == 2
+    #Xm += LCOS_X_SIZE/2.
+    #Ym += LCOS_Y_SIZE/2.
+    #XM, YM = np.atleast_2d(Xm), np.atleast_2d(Ym)
+    #if debug:
+    #    fprint_kw(XM_YM_shape_assert=(len(XM.shape) == len(YM.shape) == 2))
+    #    assert len(XM.shape) == len(YM.shape) == 2
 
-    if darken_cspot: assert (CD[0] < XM.shape[0]) and (CD[1] < XM.shape[1])
+    #if darken_cspot: assert (CD[0] < XM.shape[0]) and (CD[1] < XM.shape[1])
 
-    C = get_spot_limits(XM, YM, debug=debug)
-    a = pattern_sep(XM, YM, C, dtype=np.uint8, **lens_params)
+    #C = get_spot_limits(XM, YM, debug=debug)
+    a = pattern_sep(XM, YM, C, dtype=np.uint8,
+                    steer_slope=steer_slope,
+                    steer_offset=steer_offset,
+                    **lens_params)
     if darken_cspot:
         xmin, xmax, ymin, ymax = C[CD[0], CD[1]]
         a[ymin:ymax+1, xmin:xmax+1] = 0

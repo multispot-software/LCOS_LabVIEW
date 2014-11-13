@@ -13,7 +13,7 @@ Arguments:
     dark_spot (int): spot number of a spot to hide
     darken (bool): if True hides spot `dark_spot`
     lw (int): line-width of the steering pattern
-    vmax (int, 0..255): max level fot the steering pattern
+    vmax (int, 0..255): max level for the steering pattern
     PhWrap (bool): if True wrap the phase above 2*pi
     pad (int): how many pixel of padding to leave around the spot pattern
         before stating the steerring pattern

@@ -32,9 +32,9 @@ def pshow(a):
 def zeros_lcos(dtye=None):
     return np.zeros((600, 800), dtype=dtype)
 
-lens_params = dict(wl=532e-9, f=32e-3, phi_max=4, phase_factor=65,
-                   ph_wrapping=True)
-steer_params = dict(vmax=120, lw=1, horizontal=False)
+lens_params = dict(wl=628e-9, f=36e-3, phi_max=4, phase_factor=56,
+                   ph_wrapping=False)
+steer_params = dict(vmax=75, lw=1, horizontal=False)
 
 ## Low-level test
 #Xm = np.array([[200, 300], [200, 300]])
