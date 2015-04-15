@@ -1,0 +1,39 @@
+Installation
+============
+LabPython requires python27.dll to be installed. Only the 32bit version work.
+
+Python(x,y) 2.7.5.1 works but I don't want to install a 32bit python distro system-wide.
+
+Therefore I installed WinPython-32bit-2.7.5.3 in a user folder (C:\Data\Antonio\software). 
+Don't install it in a system dir because will require admin privilege to run and will not work.
+The file python27.dll is in 
+
+C:\Data\Antonio\software\WinPython-32bit-2.7.5.3\python-2.7.5
+
+I "registered" this WinPython version in the system registry with 
+
+"WinPython Control Panel.exe" -> Advanged -> Register distribution...
+
+The first time LabPython is executed needs to be configured to point to the right dll. Open
+the VI "PYTHON Symple Execute.vi" (in the local labpython folder) that I modified inserting 
+the object "PYTHON Set Server PATH". Running this VI only once should set the path correctly.
+
+Try to run the other examples to be sure.
+
+Running Python Code
+===================
+The ScriptNode acts funky. Start from code in a text editor, delete all the content in the
+scriptnode, paste the new code. Never modify the code manually in the script node because
+even a space addition can cause the execution to fail. Start with a simple code that works
+and paste it. If it doesn't work do copy/delete all/paste again, most of the times fails the 
+first time, but works the second and third time.
+
+Try to keep the the script node code to a minimum and import everything from a module.
+
+Running LCOS interface
+======================
+- Open LV2011 (if already open close and reopen it)
+- Open the project
+- Open multi_spot_pattern_static2.vi and run it, it will fail the first time
+- Close and reopen the VI, now run will succeed
+- Keep the VI open and run LCOS UI v3
