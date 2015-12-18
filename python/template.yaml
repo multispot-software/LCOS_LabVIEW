@@ -1,0 +1,16 @@
+Xm_string: [%Xm_string%]
+Ym_string: [%Ym_string%]
+phi_max: %phi_max%
+wl: %wl%
+f: %f%
+phase_factor: %phase_factor%
+center_spot: %center_spot%  # bool
+darken_cspot: %darken_cspot%  # bool
+lw: %lw%
+vmax: %vmax%
+ph_wrapping: %ph_wrapping%  # bool
+pad: %pad%
+dark_all: %dark_all%  # bool
+nospot: %nospot%  # bool
+steer_horiz: %steer_horiz%  # bool
+debug: %debug%  # bool
