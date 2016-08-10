@@ -32,6 +32,7 @@
 		<Item Name="Load LCOS Pattern.vi" Type="VI" URL="../Load LCOS Pattern.vi"/>
 		<Item Name="Pattern_to_YAML.vi" Type="VI" URL="../Pattern_to_YAML.vi"/>
 		<Item Name="Periodic Spot Pattern Parameters.ctl" Type="VI" URL="../Periodic Spot Pattern Parameters.ctl"/>
+		<Item Name="PointGreyCameraViewer - Copy.vi" Type="VI" URL="../../../cameras/LabVIEW_CameraVIEW/PointGreyCameraViewer - Copy.vi"/>
 		<Item Name="python_pattern.vi" Type="VI" URL="../python_pattern.vi"/>
 		<Item Name="python_pattern_script_node.vi" Type="VI" URL="../python_pattern_script_node.vi"/>
 		<Item Name="Read Pattern from disk.vi" Type="VI" URL="../Read Pattern from disk.vi"/>
@@ -94,12 +95,17 @@
 				<Item Name="IMAQ Load Image Dialog" Type="VI" URL="/&lt;vilib&gt;/vision/Files.llb/IMAQ Load Image Dialog"/>
 				<Item Name="IMAQ ReadFile" Type="VI" URL="/&lt;vilib&gt;/vision/Files.llb/IMAQ ReadFile"/>
 				<Item Name="IMAQ SetImageSize" Type="VI" URL="/&lt;vilib&gt;/vision/Basics.llb/IMAQ SetImageSize"/>
+				<Item Name="IMAQdx.ctl" Type="VI" URL="/&lt;vilib&gt;/userDefined/High Color/IMAQdx.ctl"/>
 				<Item Name="LVRectTypeDef.ctl" Type="VI" URL="/&lt;vilib&gt;/Utility/miscctls.llb/LVRectTypeDef.ctl"/>
+				<Item Name="NI_Vision_Acquisition_Software.lvlib" Type="Library" URL="/&lt;vilib&gt;/vision/driver/NI_Vision_Acquisition_Software.lvlib"/>
 				<Item Name="NI_Vision_Development_Module.lvlib" Type="Library" URL="/&lt;vilib&gt;/vision/NI_Vision_Development_Module.lvlib"/>
 				<Item Name="SetMenuItemInfoSCConverter.vi" Type="VI" URL="/&lt;vilib&gt;/_oldvers/_oldvers.llb/SetMenuItemInfoSCConverter.vi"/>
 			</Item>
 			<Item Name="Init LCOS Menu.vi" Type="VI" URL="../Init LCOS Menu.vi"/>
 			<Item Name="Launch DS Server if Local URL.vi" Type="VI" URL="../../../../../../Program Files (x86)/National Instruments/LabVIEW 2011/examples/comm/datasktcore.llb/Launch DS Server if Local URL.vi"/>
+			<Item Name="niimaqdx.dll" Type="Document" URL="niimaqdx.dll">
+				<Property Name="NI.PreserveRelativePath" Type="Bool">true</Property>
+			</Item>
 			<Item Name="nivision.dll" Type="Document" URL="nivision.dll">
 				<Property Name="NI.PreserveRelativePath" Type="Bool">true</Property>
 			</Item>
