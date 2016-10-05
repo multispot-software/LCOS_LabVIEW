@@ -1,6 +1,7 @@
 ﻿<?xml version='1.0' encoding='UTF-8'?>
 <Project Type="Project" LVVersion="11008008">
 	<Item Name="My Computer" Type="My Computer">
+		<Property Name="NI.SortType" Type="Int">3</Property>
 		<Property Name="server.app.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="server.control.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="server.tcp.enabled" Type="Bool">false</Property>
@@ -10,6 +11,12 @@
 		<Property Name="server.vi.callsEnabled" Type="Bool">true</Property>
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
+		<Item Name="old python" Type="Folder">
+			<Item Name="python_pattern.vi" Type="VI" URL="../python_pattern.vi"/>
+			<Item Name="test_python_pattern.vi" Type="VI" URL="../test_python_pattern.vi"/>
+			<Item Name="test_python_installation.vi" Type="VI" URL="../test_python_installation.vi"/>
+			<Item Name="python_pattern_script_node.vi" Type="VI" URL="../python_pattern_script_node.vi"/>
+		</Item>
 		<Item Name="Compute Spot Pattern v2.vi" Type="VI" URL="../Compute Spot Pattern v2.vi"/>
 		<Item Name="Compute State Sequence.vi" Type="VI" URL="../Compute State Sequence.vi"/>
 		<Item Name="Correct LCOS Pattern.vi" Type="VI" URL="../Correct LCOS Pattern.vi"/>
@@ -30,16 +37,15 @@
 		<Item Name="LCOS State Machine States.ctl" Type="VI" URL="../LCOS State Machine States.ctl"/>
 		<Item Name="Load LCOS Correction Pattern.vi" Type="VI" URL="../Load LCOS Correction Pattern.vi"/>
 		<Item Name="Load LCOS Pattern.vi" Type="VI" URL="../Load LCOS Pattern.vi"/>
-		<Item Name="Pattern_to_YAML.vi" Type="VI" URL="../Pattern_to_YAML.vi"/>
 		<Item Name="Periodic Spot Pattern Parameters.ctl" Type="VI" URL="../Periodic Spot Pattern Parameters.ctl"/>
 		<Item Name="PointGreyCameraViewer - Copy.vi" Type="VI" URL="../../../cameras/LabVIEW_CameraVIEW/PointGreyCameraViewer - Copy.vi"/>
-		<Item Name="python_pattern.vi" Type="VI" URL="../python_pattern.vi"/>
-		<Item Name="python_pattern_script_node.vi" Type="VI" URL="../python_pattern_script_node.vi"/>
 		<Item Name="Read Pattern from disk.vi" Type="VI" URL="../Read Pattern from disk.vi"/>
 		<Item Name="Set LabPython Server Path.vi" Type="VI" URL="../Set LabPython Server Path.vi"/>
-		<Item Name="test_python_pattern.vi" Type="VI" URL="../test_python_pattern.vi"/>
 		<Item Name="Update LCOS Image.vi" Type="VI" URL="../Update LCOS Image.vi"/>
 		<Item Name="Update Preview Image.vi" Type="VI" URL="../Update Preview Image.vi"/>
+		<Item Name="pattern_to_YAML.vi" Type="VI" URL="../pattern_to_YAML.vi"/>
+		<Item Name="pattern_request_TCP.vi" Type="VI" URL="../pattern_request_TCP.vi"/>
+		<Item Name="pattern_from_sever.vi" Type="VI" URL="../pattern_from_sever.vi"/>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="user.lib" Type="Folder">
 				<Item Name="lvpython.dll" Type="Document" URL="/&lt;userlib&gt;/_OpenG.lib/labpython/lvpython.dll"/>

@@ -1,5 +1,5 @@
 import numpy as np
-from patternlib_simple import get_spot_pattern, fprint, fprint_kw
+from patternlib_simple2 import get_spot_pattern, fprint, fprint_kw
 
 
 def pattern_wrapper(Xm, Ym, f, wl, phi_max, phase_factor, center_spot,
