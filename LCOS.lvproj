@@ -46,6 +46,11 @@
 		<Item Name="pattern_to_YAML.vi" Type="VI" URL="../pattern_to_YAML.vi"/>
 		<Item Name="pattern_request_TCP.vi" Type="VI" URL="../pattern_request_TCP.vi"/>
 		<Item Name="pattern_from_sever.vi" Type="VI" URL="../pattern_from_sever.vi"/>
+		<Item Name="python_pattern2.vi" Type="VI" URL="../python_pattern2.vi"/>
+		<Item Name="YAML_float.vi" Type="VI" URL="../YAML_float.vi"/>
+		<Item Name="YAML_csv_entry.vi" Type="VI" URL="../YAML_csv_entry.vi"/>
+		<Item Name="YAML_int.vi" Type="VI" URL="../YAML_int.vi"/>
+		<Item Name="YAML_bool.vi" Type="VI" URL="../YAML_bool.vi"/>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="user.lib" Type="Folder">
 				<Item Name="lvpython.dll" Type="Document" URL="/&lt;userlib&gt;/_OpenG.lib/labpython/lvpython.dll"/>
@@ -88,8 +93,6 @@
 			<Item Name="vi.lib" Type="Folder">
 				<Item Name="Color (U64)" Type="VI" URL="/&lt;vilib&gt;/vision/Image Controls.llb/Color (U64)"/>
 				<Item Name="Color to RGB.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/colorconv.llb/Color to RGB.vi"/>
-				<Item Name="ex_BuildTextVarProps.ctl" Type="VI" URL="/&lt;vilib&gt;/express/express output/BuildTextBlock.llb/ex_BuildTextVarProps.ctl"/>
-				<Item Name="ex_CorrectErrorChain.vi" Type="VI" URL="/&lt;vilib&gt;/express/express shared/ex_CorrectErrorChain.vi"/>
 				<Item Name="Image Type" Type="VI" URL="/&lt;vilib&gt;/vision/Image Controls.llb/Image Type"/>
 				<Item Name="IMAQ ArrayToColorImage" Type="VI" URL="/&lt;vilib&gt;/vision/Basics.llb/IMAQ ArrayToColorImage"/>
 				<Item Name="IMAQ ColorImageToArray" Type="VI" URL="/&lt;vilib&gt;/vision/Basics.llb/IMAQ ColorImageToArray"/>

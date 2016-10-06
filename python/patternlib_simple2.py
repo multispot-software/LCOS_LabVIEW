@@ -279,6 +279,26 @@ def get_test_pattern():
     a[LCOS_X_SIZE:LCOS_X_SIZE+256] = np.arange(256)[::-1]
     return a.astype('uint8').reshape(LCOS_Y_SIZE, LCOS_X_SIZE)
 
+
+def spot_coord_test():
+    step = 50
+    Xm = np.arange(-200, 200, step, dtype=float)
+    Ym = 10 * np.cos(Xm * 2*np.pi/(4*step))
+    return Xm, Ym
+
+
+def sanitize_spot_coord(Xm, Ym):
+    if len(Xm) == 0 or len(Ym) == 0:
+        print('WARNING: At lest one spot coordinate is empy.')
+        return spot_coord_test()
+    elif len(Xm) != len(Ym):
+        print('WARNING: X and Y spot coordinates have different sizes.')
+        return spot_coord_test()
+
+    Xm = np.array(Xm)
+    Ym = np.array(Ym)
+    return Xm, Ym
+
 def pattern_from_dict(ncols, nrows, rotation, spotsize, pitch_x, pitch_y,
                  center_x, center_y, wavelen, steer_lw, steer_vmax,
                  ref_spot, focal, phase_max, phase_factor, steer_pad,
@@ -292,8 +312,7 @@ def pattern_from_dict(ncols, nrows, rotation, spotsize, pitch_x, pitch_y,
                                  pitch_x=pitch_x, pitch_y=pitch_y,
                                  center_x=center_x, center_y=center_y)
     else:
-        Xm = np.array(Xm)
-        Ym = np.array(Ym)
+        Xm, Ym = sanitize_spot_coord(Xm, Ym)
 
     lens_params = dict(wavelen=wavelen, f=focal, phase_max=phase_max,
                        phase_factor=phase_factor,
