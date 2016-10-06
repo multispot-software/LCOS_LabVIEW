@@ -4,9 +4,9 @@ from patternlib_simple2 import pattern_from_dict
 
 
 def process_recv_data(data):
-    print(data)
+    #print(data)
     params = yaml.load(data)
-    print(params)
+    print(params, end='\n\n')
     a = pattern_from_dict(**params)
     return a.tobytes()
 
