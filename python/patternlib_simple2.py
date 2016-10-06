@@ -1,5 +1,6 @@
 import numpy as np
 
+
 LOG_FILE = 'C:/Data/Antonio/software/LCOS/python_out.txt'
 LCOS_X_SIZE, LCOS_Y_SIZE, LCOS_PIX_SIZE = 800, 600, 20e-6
 
@@ -22,11 +23,11 @@ def black_pattern(dtype=np.uint8):
     return np.zeros((LCOS_Y_SIZE, LCOS_X_SIZE), dtype=dtype)
 
 
-def phase_spherical(r, f, wl=532e-9):
+def phase_spherical(r, f, wavelen=532e-9):
     """Phase profile (in pi units) at distance r (x,y) from spot center
     for a spherical wave converging at a distance f from the screen.
     Inputs in SI units. The formula is exact, not approximated."""
-    return -(2/wl) * (np.sqrt(r**2 + f**2) - f)
+    return -(2/wavelen) * (np.sqrt(r**2 + f**2) - f)
 
 
 def get_steer_pattern(lw, vmax=255, horizontal=True, debug=False):
@@ -35,7 +36,7 @@ def get_steer_pattern(lw, vmax=255, horizontal=True, debug=False):
     Arguments:
         lw (uint): line-width in LCOS pixels for the steering pattern
         vmax (int, 0..255): max value for the steering pattern
-        horizontal (bool): if True draw orizontal line, else vertical
+        horizontal (bool): if True draw horizontal line, else vertical
     """
     a = black_pattern()
     if vmax > 0:
@@ -52,7 +53,12 @@ def get_steer_pattern(lw, vmax=255, horizontal=True, debug=False):
 
 def get_spot_limits(X, Y, debug=False):
     """
-    From X,Y (spot positions) compute the limits for each spot
+    From an array of X, Y spot positions compute the boundaries for each spot.
+
+    Returns:
+        An array of shape (Y_dim, X_dim, 4), where for each spot (x, y)
+        there are 4 values representing the spot boundaries in the following
+        order: (xmin, xmax, ymin, ymax).
     """
     if debug:
         fprint_kw(X_Y_shape_assert=(X.shape == Y.shape))
@@ -94,13 +100,13 @@ def get_spot_limits(X, Y, debug=False):
     return C
 
 
-def single_pattern_steer(xm, ym, mask=None, a=None, phi_max=0, f=30e-3,
-                         wl=532e-9, steer_slope=None, steer_offset=0):
+def single_pattern_steer(xm, ym, mask=None, a=None, phase_max=0, f=30e-3,
+                         wavelen=532e-9, steer_slope=None, steer_offset=0):
     """Single spot lens and linear steering phase pattern (1 = pi).
 
     Centered at (xm,ym) in LCOS pixel units.
     The pattern is computed on the subset of LCOS pixels selected by mask.
-    `phi_max` is constant phase to add to the pattern (in pi units).
+    `phase_max` is constant phase to add to the pattern (in pi units).
     `a` is an (optional) array in which to store the pattern.
     `steer_slope`: max linear phase (1 = pi) for spot steering may be < 0
     """
@@ -110,7 +116,7 @@ def single_pattern_steer(xm, ym, mask=None, a=None, phi_max=0, f=30e-3,
         mask = np.ones(a.shape, dtype=bool)
     radius = lambda x, y: np.sqrt(x**2 + y**2)
     R = radius((XL[mask] - xm)*LCOS_PIX_SIZE, (YL[mask] - ym)*LCOS_PIX_SIZE)
-    a[mask] = phi_max + phase_spherical(R, f=f, wl=wl)
+    a[mask] = phase_max + phase_spherical(R, f=f, wavelen=wavelen)
 
     if steer_slope is not None:
         ycenter = 0.5*(YL[mask].max() + YL[mask].min())
@@ -118,22 +124,26 @@ def single_pattern_steer(xm, ym, mask=None, a=None, phi_max=0, f=30e-3,
     return a
 
 
-def pattern_sep(X, Y, C, phi_max, f=30e-3, wl=532e-9, phase_factor=1,
-                ph_wrapping=False, clip=True, dtype=np.uint8, debug=False,
+def pattern_sep(X, Y, C, phase_max, f=30e-3, wavelen=532e-9, phase_factor=1,
+                phase_wrap=False, clip=True, dtype=np.uint8, debug=False,
                 steer_slope=None, steer_offset=0):
     """Pattern for spots centered in X,Y and rectangular limits defined in C.
 
     Arguments:
         X, Y (2d arrays): center positions of the spots
         C (3d array): for each spot has 4 values (xmin, xmax, ymin, ymax)
-            that define the spot boundaries
-        phi_max (float): constant phase added to the pattern (in pi units)
+            that defines the spot boundaries
+        phase_max (float): constant phase added to the pattern (in pi units)
         f (float): focal length of generated lenses (m)
-        wl (float): wavelength of laser
-        phase_factor (uint8): the 8-bit value (grey scale) corresponding to pi
-        ph_wrapping (bool): if True wraps all the phase values < 0 to 0..2pi
+        wavelen (float): wavelength of laser
+        phase_factor (uint8): the 8-bit value (gray scale) corresponding to pi
+        phase_wrap (bool): if True wraps all the phase values < 0 to 0..2pi
         clip (bool): if True clips to 255 all the phase values > 255
-        debug (bool): if True prints debugging info to a file
+        dtype (numpy.dtype): data type to use in the returned array.
+            Default uint8.
+        debug (bool): if True prints debugging info into the log file.
+        steer_slope (None or float): a parameter for per-spot steering.
+        steer_offset (None or float): a parameter for per-spot steering.
     """
     a = black_pattern(float)
 
@@ -142,13 +152,13 @@ def pattern_sep(X, Y, C, phi_max, f=30e-3, wl=532e-9, phase_factor=1,
             xm, ym = X[iy, ix], Y[iy, ix]
             xmin, xmax, ymin, ymax = C[iy, ix]
             mask = (XL >= xmin) * (XL <= xmax) * (YL >= ymin) * (YL <= ymax)
-            single_pattern_steer(xm, ym, mask=mask, a=a, phi_max=phi_max, f=f,
-                                 wl=wl,
+            single_pattern_steer(xm, ym, mask=mask, a=a, phase_max=phase_max, f=f,
+                                 wavelen=wavelen,
                                  steer_slope=steer_slope,
                                  steer_offset=steer_offset)
     neg_phase = a < 0
-    if ph_wrapping:
-        a[neg_phase] = a[neg_phase] % phi_max
+    if phase_wrap:
+        a[neg_phase] = a[neg_phase] % phase_max
         if debug:
             fprint_kw(a_pos_assert=(a>=0).all())
             assert (a>=0).all()
@@ -160,9 +170,9 @@ def pattern_sep(X, Y, C, phi_max, f=30e-3, wl=532e-9, phase_factor=1,
 
 
 def get_outer_mask(C, pad=0):
-    """Get a rectaungular mask that selects outside the spot pattern.
+    """Get a rectangular mask that selects outside the spot pattern.
     `pad`: an additional padding that can be added around the spot pattern.
-    `sigma`: if > 0 makes the transition smooth (std_dev of gaussian filter)
+    `sigma`: if > 0 makes the transition smooth (std_dev of Gaussian filter)
             in this case the mask is not boolean anymore but float in [0..1]
     """
     mask = np.ones(XL.shape)
@@ -173,20 +183,21 @@ def get_outer_mask(C, pad=0):
     return mask
 
 
-def get_spot_pattern(Xm, Ym, lens_params, steer_params, pad=2, CD=(0,4),
-                     darken_cspot=False, dark_all=False, nospot=False,
+def get_spot_pattern(Xm, Ym, lens_params, steer_params, pad=2, ref_spot=4,
+                     ref_spot_dark=False, dark_all=False, nospot=False,
                      debug=False,
                      steer_slope=None, steer_offset=0,
                      ):
     """Return the pattern with the multi-spot lenses and the beam steering.
 
     Arguments:
-        pad (uint): #pixels of padding for the lens pattern
-        CD (tuple): coordinates of the pixel considerred the center one
-        darken_cspot (bool): if True darken the center spot
-        dark_all (bool): if True return an array of zeros
-        nospot (bool): if True return only the steering pattern
-        debug (bool): if True prints debugging info to a file
+        pad (uint): # pixels of zero-padding around the lens pattern before
+            the steering pattern starts.
+        ref_spot (int): index of the spot considered as reference (e.g. center).
+        ref_spot_dark (bool): if True darken the reference spot.
+        dark_all (bool): if True return an array of zeros.
+        nospot (bool): if True return only the steering pattern with no spots.
+        debug (bool): if True prints debugging info into the log file.
     """
     steer_params.update(debug=debug)
     lens_params.update(debug=debug)
@@ -201,21 +212,24 @@ def get_spot_pattern(Xm, Ym, lens_params, steer_params, pad=2, CD=(0,4),
         fprint_kw(XM_YM_shape_assert=(len(XM.shape) == len(YM.shape) == 2))
         assert len(XM.shape) == len(YM.shape) == 2
 
-    if darken_cspot:
-        assert (CD[0] < XM.shape[0]) and (CD[1] < XM.shape[1])
-
     C = get_spot_limits(XM, YM, debug=debug)
     a = pattern_sep(XM, YM, C, dtype=np.uint8,
                     steer_slope=steer_slope,
                     steer_offset=steer_offset,
                     **lens_params)
-    if darken_cspot:
-        xmin, xmax, ymin, ymax = C[CD[0], CD[1]]
-        a[ymin:ymax+1, xmin:xmax+1] = 0
+    if ref_spot_dark:
+        if ref_spot >= 0 and ref_spot < XM.size:
+            nrows, ncols = XM.shape
+            rspot_y = ref_spot // ncols
+            rspot_x = ref_spot % ncols
+            xmin, xmax, ymin, ymax = C[rspot_y, rspot_x]
+            a[ymin:ymax + 1, xmin:xmax + 1] = 0
+        else:
+            print('WARNING: ref_spot out of range: %d' % ref_spot)
     if steer_params['vmax'] > 0:
-        ad = get_steer_pattern(**steer_params)
+        steer_img = get_steer_pattern(**steer_params)
         mask = get_outer_mask(C, pad=pad)
-        a[mask] = ad[mask]
+        a[mask] = steer_img[mask]
     return a
 
 
@@ -231,10 +245,41 @@ def spot_coord_grid(nrows, ncols, pitch_x=25, pitch_y=25,
     ym = (np.arange(0, nrows, dtype=float) - (nrows-1)/2) * pitch_y
     return np.meshgrid(xm, ym)
 
+def get_test_pattern():
+    a = np.arange(LCOS_Y_SIZE * LCOS_X_SIZE, dtype=float)
+    a *= (255 / a.max())
+    return a.astype('uint8').reshape(LCOS_Y_SIZE, LCOS_X_SIZE)
+
+def pattern_from_dict(ncols, nrows, rotation, spotsize, pitch_x, pitch_y,
+                 center_x, center_y, wavelen, steer_lw, steer_vmax,
+                 ref_spot, focal, phase_max, phase_factor, steer_pad,
+                 Xm, Ym, phase_wrap, phase_oversh, steer_horiz, test_pattern,
+                 nospot, grid, dark_all, ref_spot_dark, debug):
+    if test_pattern:
+        return get_test_pattern()
+
+    if grid:
+        Xm, Ym = spot_coord_grid(nrows=nrows, ncols=ncols,
+                                 pitch_x=pitch_x, pitch_y=pitch_y,
+                                 center_x=center_x, center_y=center_y)
+    else:
+        Xm = np.array(Xm)
+        Ym = np.array(Ym)
+
+    lens_params = dict(wavelen=wavelen, f=focal, phase_max=phase_max,
+                       phase_factor=phase_factor, phase_wrap=phase_wrap)
+
+    steer_params = dict(vmax=steer_vmax, lw=steer_lw,
+                        horizontal=steer_horiz)
+    a = get_spot_pattern(Xm, Ym, lens_params, steer_params, pad=steer_pad,
+                         ref_spot_dark=ref_spot_dark, ref_spot=ref_spot,
+                         dark_all=dark_all, nospot=nospot, debug=debug)
+    return a
+
 
 if __name__ == "__main__":
-    lens_params = dict(wl=532e-9, f=32e-3, phi_max=4, phase_factor=65,
-                       ph_wrapping=False)
+    lens_params = dict(wavelen=532e-9, f=32e-3, phase_max=4, phase_factor=65,
+                       phase_wrap=False)
     steer_params = dict(vmax=120, lw=180, horizontal=False)
 
     Xm = np.array([  23.87  ,   46.99  ,   70.1875,   93.4175,  116.6275,
