@@ -11,7 +11,7 @@ float64 patnumx, patnumy;
 float64 patnumsqr, patnumscale, patnumratio;
 float64 rotx, roty;
 float64 rotm00, rotm01, rotm10, rotm11;
-float64 val;
+float64 val, phase_wrap_max;
 float64 pattern_spotsize;
 float64 patnumx_frac, patnumy_frac;
 float64 pattern_spotborder, pattern_spotbordertop, pattern_spotborderbot;
@@ -42,9 +42,9 @@ pat_cent_y = image_height / 2;
 //							   num_spot=4: first = -2; last = 2
 // num_xspot, num_yspot: user provided (int32)
 // NOTE: LV truncate to int towards 0
-first_xspot = -num_xspots/2; 
+first_xspot = -num_xspots/2;
 last_xspot = first_xspot + num_xspots;
-first_yspot = -num_yspots/2; 
+first_yspot = -num_yspots/2;
 last_yspot = first_yspot + num_yspots;
 LVbug_cx = 0;
 LVbug_cy = 0;
@@ -98,7 +98,7 @@ for (y=0; y<image_height; y++) {
 		// Center of current spot in meters
 		pat_xcent = pattern_pitch*(floor(patnumx) + 0.5);
 		pat_ycent = pattern_pitch*(floor(patnumy) + 0.5);
-		
+
 		// Coordinates relative to the spot center in spot-number units
 		patnumx_frac = patnumx - (floor(patnumx) + 0.5);
 		patnumy_frac = patnumy - (floor(patnumy) + 0.5);
@@ -110,19 +110,19 @@ for (y=0; y<image_height; y++) {
 			(patnumx_frac <= pattern_spotbordertop) &&
 			(patnumy_frac >= pattern_spotborderbot) &&
 			(patnumy_frac <= pattern_spotbordertop) ) {
-			
+
 			x0_folcalshift = pattern_pitch*(floor(patnumx)-xo_focalshift);
 			y0_folcalshift = pattern_pitch*(floor(patnumy)+yo_focalshift);
 			focal_shift = focal_shiftparam*(x0_folcalshift**2 + y0_folcalshift**2);
 			focal_perspot = focal_distance + focal_shift;
-			
+
 			if (darken_center_spot &&
 				patnumx < 1+LVbug_cx && patnumx > LVbug_cx &&
 				patnumy < 1+LVbug_cy && patnumy > LVbug_cy) {
 				lcospat[y][x] = 0;
 				continue;
 			}
-			
+
 			// Coordinates relative to the spot center in meters
 			x_dist = pattern_pitch * patnumx_frac;
 			y_dist = pattern_pitch * patnumy_frac;
@@ -131,10 +131,10 @@ for (y=0; y<image_height; y++) {
 
 			if (exact_formula) {
 				cos_theta = cos(atan(sqrt(dist_sqr)/focal_perspot));
-				lcospat[y][x] = const_phase - 1e-6 - (2/wavelength) * (1-cos_theta) * sqrt(dist_sqr + focal_perspot**2); 
-			} 
+				lcospat[y][x] = phase_max - 1e-6 - (2/wavelength) * (1-cos_theta) * sqrt(dist_sqr + focal_perspot**2);
+			}
 			else
-				lcospat[y][x] = const_phase - 1e-6 - dist_sqr / (wavelength*focal_distance);
+				lcospat[y][x] = phase_max - 1e-6 - dist_sqr / (wavelength*focal_distance);
 		}
 		else {
 		// Make unused area plane wave, to be filtered out by pindot.
@@ -155,26 +155,40 @@ for (y=0; y<image_height; y++) {
 for (y=0; y<image_height; y++) {
 	for (x=0; x<image_width; x++) {
 		val = lcospat[y][x];
-		
+
 		// Set the outside of the pattern for beam steering
 		if ((val == 0) && (lw > 1))
-			val = steer_pattern[y][x]/phase_factor;
+			val = steer_pattern[y][x] / phase_factor;
 
-		// IF phase doesn't wrap
-		// set pixels in between pattern to 0 for smoothness
-		if ((!wrap_phase) && (val < 0))
+        // compute smallest multiple of 2 contained in phase_max
+        if (phase_wrap_neg || phase_wrap_pos) {
+            if (phase_max <= 2)
+                phase_wrap_max = 2;
+            else
+                phase_wrap_max = floor(phase_max / 2) * 2;
+        }
+
+		// Wrap negative phase values or set them to 0
+		if ((!phase_wrap_neg) && (val < 0))
 			val = 0;
-		
-		// ELSE remove extra 2PI
-		if (wrap_phase) {
-			if ((val < 0) || (!phase_overshoot && (val >= 2)))
-				val -= floor(val/2)*2;
+        else if (phase_wrap_neg) {
+			if (val < 0) {
+                // modulus of val over phase_wrap_max
+				val -= floor(val/phase_wrap_max) * phase_wrap_max;
+            }
 		}
+
+        // Wrap positive phase values above 2*pi
+        if (phase_wrap_pos) {
+            if (val > 2) {
+                // modulus of val over phase_wrap_max
+                val -= floor(val/phase_wrap_max) * phase_wrap_max;
+            }
+        }
 
 		// Map PI to correct greyscale value.
 		val = val * phase_factor;
-		
+
 		lcospat[y][x] = val;
 	}
 }
-
