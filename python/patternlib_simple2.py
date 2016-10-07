@@ -259,31 +259,70 @@ def phase_pattern(Xm, Ym, lens_params, steer_params, pad=2, ref_spot=4,
 
 
 def spot_coord_grid(nrows, ncols, pitch_x=25, pitch_y=25,
-                    center_x=0, center_y=0):
+                    center_x=0, center_y=0, rotation=0):
     """Returns the coordinates of spots arranged on a rectangular grid.
 
+    Arguments:
+        nrows, ncols (ints): number spots in the Y (nrows) and X(ncols)
+            direction.
+        pitch_x, pitch_y (floats): spot pitch in X and Y direction.
+        center_x, center_y (floats): coordinate of the pattern center.
+        rotation (float): rotation angle in degree.
+
     Returns:
-        Two arrays of X and Y coordinates. These arrays can be directly
-        passed to :func:`phase_pattern` to generate a pattern of spots.
+        A tuple (X, Y) of two 2D arrays containing the grid of spot centers.
+        These arrays can be directly passed to :func:`phase_pattern` to
+        generate a pattern of spots.
     """
-    xm = (np.arange(0, ncols, dtype=float) - (ncols-1)/2) * pitch_x
-    ym = (np.arange(0, nrows, dtype=float) - (nrows-1)/2) * pitch_y
-    xm += center_x
-    ym += center_y
-    return np.meshgrid(xm, ym)
+    xp = (np.arange(0, ncols, dtype=float) - (ncols-1)/2) * pitch_x
+    yp = (np.arange(0, nrows, dtype=float) - (nrows-1)/2) * pitch_y
+    Xp, Yp = np.meshgrid(xp, yp)  # spot centers in pattern space
+
+    # Roto-translation to go to LCOS space
+    Xm, Ym = rotate(Xp, Yp, rotation)
+    Xm += center_x
+    Ym += center_y
+    return Xm, Ym
+
+
+def rotate(x, y, angle):
+    """Rotate the point (x, y) (or array of points) with respect to the origin.
+
+    Arguments:
+        x, y (flaots or arrays): input coordinates to be transformed.
+        angle (float): rotation angle in degrees. When the Y axis points
+            up and the X axis points right, a positive angle result in
+            a counter-clock-wise rotation.
+
+    Returns:
+        New coordinates or the rotated point.
+    """
+    if angle == 0:
+        return x, y
+    shape = x.shape
+    assert shape == y.shape
+    x_ = x.ravel()
+    y_ = y.ravel()
+    theta = angle * np.pi / 180
+    rot_matrix = np.array([[np.cos(theta), -np.sin(theta)],
+                           [np.sin(theta), np.cos(theta)]])
+    v = np.vstack([x_, y_])
+    xr, yr = rot_matrix @ v
+    return xr.reshape(shape), yr.reshape(shape)
+
 
 def get_test_pattern():
     a = np.arange(LCOS_Y_SIZE * LCOS_X_SIZE, dtype=float)
     a *= (255 / a.max())
     a[:256] = np.arange(256)
-    a[LCOS_X_SIZE:LCOS_X_SIZE+256] = np.arange(256)[::-1]
+    a[LCOS_X_SIZE:LCOS_X_SIZE + 256] = np.arange(256)[::-1]
     return a.astype('uint8').reshape(LCOS_Y_SIZE, LCOS_X_SIZE)
 
 
 def spot_coord_test():
     step = 50
     Xm = np.arange(-200, 200, step, dtype=float)
-    Ym = 10 * np.cos(Xm * 2*np.pi/(4*step))
+    Ym = 10 * np.cos(Xm * 2*np.pi / (4*step))
     return Xm, Ym
 
 
@@ -299,6 +338,7 @@ def sanitize_spot_coord(Xm, Ym):
     Ym = np.array(Ym)
     return Xm, Ym
 
+
 def pattern_from_dict(ncols, nrows, rotation, spotsize, pitch_x, pitch_y,
                  center_x, center_y, wavelen, steer_lw, steer_vmax,
                  ref_spot, focal, phase_max, phase_factor, steer_pad,
@@ -308,7 +348,7 @@ def pattern_from_dict(ncols, nrows, rotation, spotsize, pitch_x, pitch_y,
         return get_test_pattern()
 
     if grid:
-        Xm, Ym = spot_coord_grid(nrows=nrows, ncols=ncols,
+        Xm, Ym = spot_coord_grid(nrows=nrows, ncols=ncols, rotation=rotation,
                                  pitch_x=pitch_x, pitch_y=pitch_y,
                                  center_x=center_x, center_y=center_y)
     else:
