@@ -191,7 +191,7 @@ def multispot_pattern(X, Y, C, phase_max, f=30e-3, wavelen=532e-9,
 
 
 def get_outer_mask(C, pad=0):
-    """Get a rectangular mask that selects outside the spot pattern.
+    """Return a mask that selects outside the spot pattern.
 
     Arguments:
         pad (int): an additional padding in number of LCOS pixels to be
@@ -200,11 +200,10 @@ def get_outer_mask(C, pad=0):
     Returns:
         2D boolean array defining the region outside the spot pattern.
     """
-    mask = np.ones(XL.shape)
-    Xmin, Xmax = C[:, :, 0].min(), C[:, :, 1].max()
-    Ymin, Ymax = C[:, :, 2].min(), C[:, :, 3].max()
-    mask[Ymin-pad : Ymax+pad+1, Xmin-pad : Xmax+pad+1] = 0
-    mask = mask.astype(bool)
+    mask = np.ones(XL.shape, dtype=bool)
+    for rows in C:
+        for spot in rows:
+            mask[spot[2]-pad:spot[3]+pad+1, spot[0]-pad:spot[1]+pad+1] = False
     return mask
 
 
