@@ -91,22 +91,14 @@ def pitch_from_centers(X, Y):
     return pitch_x, pitch_y
 
 
-def get_spot_regions(X, Y, pitch_x=None, pitch_y=None,
-                     center_x=None, center_y=None, rotation=0):
+def get_spot_regions(nspots_x, nspots_y, pitch_x, pitch_y,
+                     center_x=0, center_y=0, rotation=0):
     """Compute rectangular regions for each spot.
 
     Returns:
         2D array of labels (ints) on the LCOS frame of reference. Spots are
         numbered starting from 0 and going thorugh columns first.
     """
-    assert X.shape == Y.shape
-    nspots_y, nspots_x = X.shape
-    if pitch_x is None or pitch_y is None:
-        pitch_x, pitch_y = pitch_from_centers(X, Y)
-    if center_x is None:
-        center_x = X.mean()
-    if center_y is None:
-        center_y = Y.mean()
     XLtr, YLtr = rotate((XL - center_x), (YL - center_y), angle=-rotation)
     spot_regions = spotmap_func((XLtr, YLtr), (pitch_x, pitch_y),
                           (nspots_x, nspots_y))
@@ -269,7 +261,7 @@ def multispot_pattern(X, Y, labels, phase_max, f=30e-3, wavelen=532e-9,
     """
     a = black_pattern(float)
 
-    for ispot, (xm, ym) in enumerate(X.ravel(), Y.ravel()):
+    for ispot, (xm, ym) in enumerate(zip(X.ravel(), Y.ravel())):
         mask = labels == ispot
         single_spot_pattern(xm, ym, mask=mask, a=a, phase_max=phase_max,
                             f=f, wavelen=wavelen)
@@ -420,7 +412,8 @@ def phase_patternC(Xm, Ym, lens_params, steer_params, pad=2, ref_spot=4,
     return a
 
 
-def phase_pattern(Xm, Ym, lens_params, steer_params, pad=2, ref_spot=4,
+def phase_pattern(Xm, Ym, lens_params, steer_params, sparams=None, pad=2,
+                  ref_spot=4,
                   ref_spot_dark=False, dark_all=False, nospot=False,
                   debug=False):
     """Return the pattern with the multi-spot lenses and the beam steering.
@@ -451,7 +444,17 @@ def phase_pattern(Xm, Ym, lens_params, steer_params, pad=2, ref_spot=4,
         fprint_kw(XM_YM_shape_assert=(len(XM.shape) == len(YM.shape) == 2))
         assert len(XM.shape) == len(YM.shape) == 2
 
-    spot_regions = get_spot_regions(XM, YM)
+    kws = dict()
+    if sparams is not None:
+        kws.update(sparams)
+        kws['center_x'] += LCOS_X_SIZE // 2
+        kws['center_y'] += LCOS_Y_SIZE // 2
+    else:
+        kws['center_x'] = XM.ravel().mean()
+        kws['center_y'] = YM.ravel().mean()
+        pitch_x, pitch_y = pitch_from_centers(XM, YM)
+    nspots_x, nspots_y = XM.shape
+    spot_regions = get_spot_regions(nspots_x, nspots_y, **kws)
     if ref_spot_dark:
         if ref_spot >= 0 and ref_spot < XM.size:
             spot_regions[spot_regions == ref_spot] = np.nan
@@ -462,7 +465,7 @@ def phase_pattern(Xm, Ym, lens_params, steer_params, pad=2, ref_spot=4,
     if steer_params['vmax'] > 0:
         # NOTE: pad is ignored here
         steer_img = get_steer_pattern(**steer_params)
-        mask = np.isnull(spot_regions)
+        mask = np.isnan(spot_regions)
         a[mask] = steer_img[mask]
     return a
 
@@ -557,11 +560,12 @@ def pattern_from_dict(ncols, nrows, rotation, spotsize, pitch_x, pitch_y,
         return get_test_pattern()
 
     if grid:
-        Xm, Ym = spot_coord_grid(nrows=nrows, ncols=ncols, rotation=rotation,
-                                 pitch_x=pitch_x, pitch_y=pitch_y,
-                                 center_x=center_x, center_y=center_y)
+        sparams = dict(rotation=rotation, pitch_x=pitch_x, pitch_y=pitch_y,
+                       center_x=center_x, center_y=center_y)
+        Xm, Ym = spot_coord_grid(nrows=nrows, ncols=ncols, **sparams)
     else:
         Xm, Ym = sanitize_spot_coord(Xm, Ym)
+        sparams = None
 
     lens_params = dict(wavelen=wavelen, f=focal, phase_max=phase_max,
                        phase_factor=phase_factor,
@@ -570,7 +574,8 @@ def pattern_from_dict(ncols, nrows, rotation, spotsize, pitch_x, pitch_y,
 
     steer_params = dict(vmax=steer_vmax, lw=steer_lw,
                         horizontal=steer_horiz)
-    a = phase_pattern(Xm, Ym, lens_params, steer_params, pad=steer_pad,
+    a = phase_pattern(Xm, Ym, lens_params, steer_params, sparams=sparams,
+                      pad=steer_pad,
                       ref_spot_dark=ref_spot_dark, ref_spot=ref_spot,
                       dark_all=dark_all, nospot=nospot, debug=debug)
     return a
