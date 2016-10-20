@@ -1,14 +1,15 @@
 import socketserver
 import yaml
-from patternlib_simple2 import pattern_from_dict
+from patternlib import compute_pattern
 
 
 def process_recv_data(data):
     #print(data)
     params = yaml.load(data)
     print(params, end='\n\n')
-    a = pattern_from_dict(**params)
+    a = compute_pattern(**params)
     return a.tobytes()
+
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
@@ -17,6 +18,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         print("- Data received.")
         response = process_recv_data(self.data)
         self.request.sendall(response)
+
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 9999
