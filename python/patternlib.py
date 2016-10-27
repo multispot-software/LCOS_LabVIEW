@@ -59,8 +59,10 @@ def get_steer_pattern(lw, vmax=255, horizontal=True):
         row_wise_a = a
         if not horizontal:
             row_wise_a = a.T
-        for i in range(0, row_wise_a.shape[0], 2 * lw):
-            row_wise_a[i:i + lw] = vmax
+        p = np.zeros(row_wise_a.shape[0])
+        for i in range(lw):
+            p[i::2*lw] = vmax
+        row_wise_a[:] = p[:, np.newaxis]
     return a
 
 
@@ -255,7 +257,7 @@ def phase_wrapping(a, phase_max, phase_factor, phase_wrap_pos, phase_wrap_neg):
     return a
 
 
-def phase_pattern(Xm, Ym, lens_params, steer_params, sparams=None, pad=2,
+def compute_mspotpattern(Xm, Ym, lens_params, steer_params, sparams=None, pad=2,
                   ref_spot=4, stretch=False,
                   ref_spot_dark=False, dark_all=False, nospot=False):
     """Return the pattern with the multi-spot lenses and the beam steering.
@@ -276,17 +278,11 @@ def phase_pattern(Xm, Ym, lens_params, steer_params, sparams=None, pad=2,
             spot pattern to match the pitch_x/y ratio. The stretching is
             simply a linear rescaling of the X coordinates, the Y coordinates
             are left unchanged. If False the single spot pattern is circular.
-        dark_all (bool): if True return an array of zeros.
-        nospot (bool): if True return only the steering pattern with no spots.
 
     Returns:
         A 2D array containing the complete phase pattern image with both spots
         and beam steering pattern.
     """
-    if dark_all:
-        return black_pattern()
-    if nospot:
-        return get_steer_pattern(**steer_params)
     XM, YM = np.atleast_2d(Xm), np.atleast_2d(Ym)
     assert len(XM.shape) == len(YM.shape) == 2
 
@@ -316,6 +312,61 @@ def phase_pattern(Xm, Ym, lens_params, steer_params, sparams=None, pad=2,
         mask = np.isnan(spot_regions)
         a[mask] = steer_img[mask]
     return a
+
+def compute_linepattern(center, width, horiz, f, phase_max, wavelen,
+                        phase_factor, phase_wrap_neg, phase_wrap_pos,
+                        steer_params, pad=0):
+    """Compute a line-pattern with an optional steer pattern.
+
+    Arguments:
+        f (float): focal length of the cylindrical lens
+            used to focus a plane wave into a line.
+        wavelen (float): wavelength of the input laser.
+        phase_max (float): peak phase reached in the middle of the lens pattern
+            (in pi units).
+        phase_factor (uint8): the 8-bit value [0..255] corresponding to pi
+        phase_wrap_neg (bool): if True wraps all the negative-phase values into
+            [0..phase_wrap_max]. phase_wrap_max is 2 when `phase_max` <= 2,
+            otherwise is the smallest multiple of 2 contained in `phase_max`.
+            When False, the negative phase values are set to 0.
+        phase_wrap_pos (bool): if True, wrap the positive phase values into
+            [0..phase_wrap_max]. phase_wrap_max is 2 when `phase_max` <= 2,
+            otherwise is the smallest multiple of 2 contained in `phase_max`.
+        steer_params (uint): dict of beam-steering parameters passed to
+            :func:`get_steer_pattern`.
+        pad (int): padding in pixels between the line pattern and the steering
+            pattern. Default 0.
+
+    Returns:
+        A 2D array containing the complete phase pattern image with both
+        the cylindrical lens (line pattern) and beam steering pattern.
+    """
+    a = black_pattern(float)
+    if horiz:
+        size_cross = LCOS_Y_SIZE
+        a_rot = a
+    else:
+        size_cross = LCOS_X_SIZE
+        a_rot = a.T
+
+    delta = width / 2
+    xy = np.arange(size_cross) - size_cross // 2
+    mask = np.abs(xy - center) < delta
+    r = (xy[mask] - center) * LCOS_PIX_SIZE
+    phase = phase_max + phase_spherical(r, f=f, wavelen=wavelen)
+    a_rot[mask] = phase[:, np.newaxis]
+    a = phase_wrapping(a, phase_max=phase_max, phase_factor=phase_factor,
+                       phase_wrap_pos=phase_wrap_pos,
+                       phase_wrap_neg=phase_wrap_neg)
+
+    if steer_params['vmax'] > 0:
+        spattern = get_steer_pattern(**steer_params)
+        if not horiz:
+            spattern = spattern.T
+        smask = np.abs(xy - center) >= delta + pad
+        a_rot[smask] = spattern[smask]
+
+    return a.round().astype('uint8')
 
 
 def spot_coord_grid(nspots_x, nspots_y, pitch_x=25, pitch_y=25,
@@ -409,14 +460,15 @@ def compute_pattern(ncols, nrows, rotation, spotsize, pitch_x, pitch_y,
                     center_x, center_y, wavelen, steer_lw, steer_vmax,
                     ref_spot, focal, phase_max, phase_factor, steer_pad,
                     Xm, Ym, phase_wrap_pos, phase_wrap_neg, steer_horiz,
-                    test_pattern, nospot, grid, dark_all, ref_spot_dark,
+                    test_pattern, grid, steer_only, dark_all, ref_spot_dark,
                     stretch):
     """Return a complete LCOS pattern computed from the input parameters.
 
     This is a small wrapper around the lower-level functions:
 
+    - :func:`compute_linepattern`
+    - :func:`compute_mspotpattern`
     - :func:`spot_coord_grid`
-    - :func:`phase_pattern`
     - :func:`multispot_pattern`
     - :func:`get_steer_pattern`
 
@@ -434,18 +486,29 @@ def compute_pattern(ncols, nrows, rotation, spotsize, pitch_x, pitch_y,
             parameters are ignored (`nspots_*`, `pitch_*`, `center_*`,
             `rotation`). If True, compute the spot coordinates from
             spot grid parameters (and `Xm` and `Ym` are ignored).
-        stretch (bool): if True and `pitch_x != pitch_y` stretch the single
-            spot pattern to match the pitch_x/y ratio. The stretching is
-            simply a linear rescaling of the X coordinates, the Y coordinates
-            are left unchanged. If False the single spot pattern is circular.
+        center_x, center_y (floats): coordinates of the multispot pattern.
+            Used also for line pattern, see explaination below.
+        pitch_x, pitch_y (floats): pitch of the mutispot pattern in X or Y
+            direction. If one of the pitch is 0 for one direction, the pitch
+            and center for the other direction are used as width and center
+            of a line pattern (see :func:`compute_linepattern`).
+        steer_only (bool): if True return only the steering pattern, ignoring
+            all the other arguments.
+        dark_all (bool): if True return an array of zeros (constant phase).
         test_pattern (bool): return a test pattern (discarding all the other
             arguments).
 
     Returns:
         2D array (uint8) containing the complete LCOS pattern.
     """
+    steer_params = dict(vmax=steer_vmax, lw=steer_lw,
+                        horizontal=steer_horiz)
     if test_pattern:
         return get_test_pattern()
+    if dark_all:
+        return black_pattern()
+    if steer_only:
+        return get_steer_pattern(**steer_params)
 
     sparams = None
     if grid:
@@ -461,10 +524,17 @@ def compute_pattern(ncols, nrows, rotation, spotsize, pitch_x, pitch_y,
                        phase_wrap_pos=phase_wrap_pos,
                        phase_wrap_neg=phase_wrap_neg)
 
-    steer_params = dict(vmax=steer_vmax, lw=steer_lw,
-                        horizontal=steer_horiz)
-    a = phase_pattern(Xm, Ym, lens_params, steer_params, sparams=sparams,
-                      pad=steer_pad, stretch=stretch,
-                      ref_spot_dark=ref_spot_dark, ref_spot=ref_spot,
-                      dark_all=dark_all, nospot=nospot)
+    line = (pitch_x == 0) or (pitch_y == 0)
+    if line:
+        if pitch_x == 0:
+            center, width, horiz = center_y, pitch_y, True
+        elif pitch_y == 0:
+            center, width, horiz = center_x, pitch_x, False
+        a = compute_linepattern(center=center, width=width, horiz=horiz,
+                                steer_params=steer_params, pad=steer_pad,
+                                **lens_params)
+    else:
+        a = compute_mspotpattern(Xm, Ym, lens_params, steer_params,
+                        sparams=sparams, pad=steer_pad, stretch=stretch,
+                        ref_spot_dark=ref_spot_dark, ref_spot=ref_spot)
     return a
