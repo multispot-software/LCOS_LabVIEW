@@ -142,6 +142,7 @@ def single_spot_pattern(xm, ym, mask=None, a=None, f=30e-3, wavelen=532e-9,
 
     Arguments:
         xm, ym (floats): coordinates of the spot center in LCOS pixel units.
+            Origin of coordinates is on the top left LCOS corner.
         mask (2D bool array): mask selecting the extension of the spot. The
             mask is usually True on a rectangular region around the spot center.
         a (2D array): an optional 2D array in which the pattern is written.
@@ -178,14 +179,14 @@ def multispot_pattern(Xm, Ym, labels, phase_max, f=30e-3, wavelen=532e-9,
     Arguments:
         Xm, Ym (2D arrays): coordinates of spot centers with respect to the
             LCOS center. The Xm and Ym shape (array's rows x cols) should
-            be the same as the spot spot grid shape (pattern's rows x cols).
+            be the same as the spot grid shape (pattern's rows x cols).
         labels (2D array): array of spot labels (ints) starting from 0.
             Defines rectangular regions for each spot on the LCOS image.
-        phase_max (float): constant phase added to the pattern (in pi units).
-            See :func:`single_spot_pattern` for details.
         f (float): focal length of the lens created on the phase pattern
             and used to focus a plane wave into a spot.
         wavelen (float): wavelength of the input laser.
+        phase_max (float): constant phase added to the pattern (in pi units).
+            See :func:`single_spot_pattern` for details.
         phase_factor (uint8): the 8-bit value [0..255] corresponding to pi
         phase_wrap_neg (bool): if True wraps all the negative-phase values into
             [0..phase_wrap_max]. phase_wrap_max is 2 when `phase_max` <= 2,
@@ -211,6 +212,29 @@ def multispot_pattern(Xm, Ym, labels, phase_max, f=30e-3, wavelen=532e-9,
         single_spot_pattern(xm, ym, mask=mask, a=a, phase_max=phase_max,
                             f=f, wavelen=wavelen, stretchx=stretchx)
 
+    a = phase_wrapping(a, phase_max=phase_max, phase_factor=phase_factor,
+                       phase_wrap_pos=phase_wrap_pos,
+                       phase_wrap_neg=phase_wrap_neg)
+    return a.round().astype(dtype)
+
+
+def phase_wrapping(a, phase_max, phase_factor, phase_wrap_pos, phase_wrap_neg):
+    """Wrap and scale phase according to input parameters.
+
+    Arguments:
+        phase_max (float): peak phase value reached in the pattern.
+        phase_factor (uint8): the 8-bit value [0..255] corresponding to pi
+        phase_wrap_neg (bool): if True wraps all the negative-phase values into
+            [0..phase_wrap_max]. phase_wrap_max is 2 when `phase_max` <= 2,
+            otherwise is the smallest multiple of 2 contained in `phase_max`.
+            When False, the negative phase values are set to 0.
+        phase_wrap_pos (bool): if True, wrap the positive phase values into
+            [0..phase_wrap_max]. phase_wrap_max is 2 when `phase_max` <= 2,
+            otherwise is the smallest multiple of 2 contained in `phase_max`.
+
+    Returns:
+        A copy of input "phase" array `a` with applied wrapping and scaling.
+    """
     if phase_wrap_neg or phase_wrap_pos:
         # smallest multiple of 2 contained in phase_max
         phase_wrap_max = 2 if phase_max <= 2 else (phase_max // 2) * 2
@@ -228,7 +252,7 @@ def multispot_pattern(Xm, Ym, labels, phase_max, f=30e-3, wavelen=532e-9,
         a[neg_phase] = 0
 
     a *= phase_factor
-    return a.round().astype(dtype)
+    return a
 
 
 def phase_pattern(Xm, Ym, lens_params, steer_params, sparams=None, pad=2,
