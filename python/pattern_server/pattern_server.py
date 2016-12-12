@@ -1,3 +1,4 @@
+#! python3
 import socketserver
 import yaml
 from patternlib import compute_pattern
@@ -19,9 +20,11 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         response = process_recv_data(self.data)
         self.request.sendall(response)
 
-
-if __name__ == "__main__":
+def main():
     HOST, PORT = "localhost", 9999
     server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
     print('Serving...')
     server.serve_forever()
+
+if __name__ == "__main__":
+    main()
