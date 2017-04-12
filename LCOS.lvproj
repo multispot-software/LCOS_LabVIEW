@@ -43,6 +43,7 @@
 		<Item Name="Update LCOS Image.vi" Type="VI" URL="../Update LCOS Image.vi"/>
 		<Item Name="Update Preview Image.vi" Type="VI" URL="../Update Preview Image.vi"/>
 		<Item Name="pattern_to_YAML.vi" Type="VI" URL="../pattern_to_YAML.vi"/>
+		<Item Name="pattern_to_file.vi" Type="VI" URL="../pattern_to_file.vi"/>
 		<Item Name="pattern_request_TCP.vi" Type="VI" URL="../pattern_request_TCP.vi"/>
 		<Item Name="pattern_from_sever.vi" Type="VI" URL="../pattern_from_sever.vi"/>
 		<Item Name="python_pattern2.vi" Type="VI" URL="../python_pattern2.vi"/>
@@ -50,6 +51,9 @@
 		<Item Name="YAML_csv_entry.vi" Type="VI" URL="../YAML_csv_entry.vi"/>
 		<Item Name="YAML_int.vi" Type="VI" URL="../YAML_int.vi"/>
 		<Item Name="YAML_bool.vi" Type="VI" URL="../YAML_bool.vi"/>
+		<Item Name="Save LCOS Configuration.vi" Type="VI" URL="../Save LCOS Configuration.vi"/>
+		<Item Name="Load LCOS Configuration.vi" Type="VI" URL="../Load LCOS Configuration.vi"/>
+		<Item Name="pattern_from_YAML.vi" Type="VI" URL="../pattern_from_YAML.vi"/>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="user.lib" Type="Folder">
 				<Item Name="lvpython.dll" Type="Document" URL="/&lt;userlib&gt;/_OpenG.lib/labpython/lvpython.dll"/>
@@ -106,6 +110,8 @@
 				<Item Name="LVRectTypeDef.ctl" Type="VI" URL="/&lt;vilib&gt;/Utility/miscctls.llb/LVRectTypeDef.ctl"/>
 				<Item Name="NI_Vision_Development_Module.lvlib" Type="Library" URL="/&lt;vilib&gt;/vision/NI_Vision_Development_Module.lvlib"/>
 				<Item Name="SetMenuItemInfoSCConverter.vi" Type="VI" URL="/&lt;vilib&gt;/_oldvers/_oldvers.llb/SetMenuItemInfoSCConverter.vi"/>
+				<Item Name="ex_CorrectErrorChain.vi" Type="VI" URL="/&lt;vilib&gt;/express/express shared/ex_CorrectErrorChain.vi"/>
+				<Item Name="subFile Dialog.vi" Type="VI" URL="/&lt;vilib&gt;/express/express input/FileDialogBlock.llb/subFile Dialog.vi"/>
 			</Item>
 			<Item Name="Init LCOS Menu.vi" Type="VI" URL="../Init LCOS Menu.vi"/>
 			<Item Name="Launch DS Server if Local URL.vi" Type="VI" URL="../../../../../../Program Files (x86)/National Instruments/LabVIEW 2011/examples/comm/datasktcore.llb/Launch DS Server if Local URL.vi"/>
