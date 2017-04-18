@@ -54,6 +54,10 @@
 		<Item Name="Save LCOS Configuration.vi" Type="VI" URL="../Save LCOS Configuration.vi"/>
 		<Item Name="Load LCOS Configuration.vi" Type="VI" URL="../Load LCOS Configuration.vi"/>
 		<Item Name="pattern_from_YAML.vi" Type="VI" URL="../pattern_from_YAML.vi"/>
+		<Item Name="YAML Get Field Value.vi" Type="VI" URL="../YAML Get Field Value.vi"/>
+		<Item Name="YAML Get Field Value Int.vi" Type="VI" URL="../YAML Get Field Value Int.vi"/>
+		<Item Name="YAML Get Field Value Double.vi" Type="VI" URL="../YAML Get Field Value Double.vi"/>
+		<Item Name="YAML Get Field Value Bool.vi" Type="VI" URL="../YAML Get Field Value Bool.vi"/>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="user.lib" Type="Folder">
 				<Item Name="lvpython.dll" Type="Document" URL="/&lt;userlib&gt;/_OpenG.lib/labpython/lvpython.dll"/>
