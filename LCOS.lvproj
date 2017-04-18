@@ -42,7 +42,7 @@
 		<Item Name="Set LabPython Server Path.vi" Type="VI" URL="../Set LabPython Server Path.vi"/>
 		<Item Name="Update LCOS Image.vi" Type="VI" URL="../Update LCOS Image.vi"/>
 		<Item Name="Update Preview Image.vi" Type="VI" URL="../Update Preview Image.vi"/>
-		<Item Name="pattern_to_YAML.vi" Type="VI" URL="../pattern_to_YAML.vi"/>
+		<Item Name="Pattern_to_YAML.vi" Type="VI" URL="../Pattern_to_YAML.vi"/>
 		<Item Name="pattern_to_file.vi" Type="VI" URL="../pattern_to_file.vi"/>
 		<Item Name="pattern_request_TCP.vi" Type="VI" URL="../pattern_request_TCP.vi"/>
 		<Item Name="pattern_from_sever.vi" Type="VI" URL="../pattern_from_sever.vi"/>
