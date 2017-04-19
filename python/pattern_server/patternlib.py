@@ -313,6 +313,7 @@ def compute_mspotpattern(Xm, Ym, lens_params, steer_params, sparams=None, pad=2,
         a[mask] = steer_img[mask]
     return a
 
+
 def compute_linepattern(center, width, horiz, f, phase_max, wavelen,
                         phase_factor, phase_wrap_neg, phase_wrap_pos,
                         steer_params, pad=0):

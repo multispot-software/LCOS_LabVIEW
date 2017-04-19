@@ -58,6 +58,7 @@
 		<Item Name="YAML Get Field Value Int.vi" Type="VI" URL="../YAML Get Field Value Int.vi"/>
 		<Item Name="YAML Get Field Value Double.vi" Type="VI" URL="../YAML Get Field Value Double.vi"/>
 		<Item Name="YAML Get Field Value Bool.vi" Type="VI" URL="../YAML Get Field Value Bool.vi"/>
+		<Item Name="YAML Get Field Value CSV.vi" Type="VI" URL="../YAML Get Field Value CSV.vi"/>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="user.lib" Type="Folder">
 				<Item Name="lvpython.dll" Type="Document" URL="/&lt;userlib&gt;/_OpenG.lib/labpython/lvpython.dll"/>
