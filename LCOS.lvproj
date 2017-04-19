@@ -43,6 +43,7 @@
 		<Item Name="Update LCOS Image.vi" Type="VI" URL="../Update LCOS Image.vi"/>
 		<Item Name="Update Preview Image.vi" Type="VI" URL="../Update Preview Image.vi"/>
 		<Item Name="Pattern_to_YAML.vi" Type="VI" URL="../Pattern_to_YAML.vi"/>
+		<Item Name="pattern_from_YAML.vi" Type="VI" URL="../pattern_from_YAML.vi"/>
 		<Item Name="pattern_to_file.vi" Type="VI" URL="../pattern_to_file.vi"/>
 		<Item Name="pattern_request_TCP.vi" Type="VI" URL="../pattern_request_TCP.vi"/>
 		<Item Name="pattern_from_sever.vi" Type="VI" URL="../pattern_from_sever.vi"/>
@@ -53,7 +54,6 @@
 		<Item Name="YAML_bool.vi" Type="VI" URL="../YAML_bool.vi"/>
 		<Item Name="Save LCOS Configuration.vi" Type="VI" URL="../Save LCOS Configuration.vi"/>
 		<Item Name="Load LCOS Configuration.vi" Type="VI" URL="../Load LCOS Configuration.vi"/>
-		<Item Name="pattern_from_YAML.vi" Type="VI" URL="../pattern_from_YAML.vi"/>
 		<Item Name="YAML Get Field Value.vi" Type="VI" URL="../YAML Get Field Value.vi"/>
 		<Item Name="YAML Get Field Value Int.vi" Type="VI" URL="../YAML Get Field Value Int.vi"/>
 		<Item Name="YAML Get Field Value Double.vi" Type="VI" URL="../YAML Get Field Value Double.vi"/>
