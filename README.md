@@ -8,10 +8,11 @@ See also the stand-alone python library for LCOS pattern generation:
 
 # Cite
 
-If you use this code for a publication please cite as:
+If you use this code, please cite the paper:
 
-> Multispot single-molecule FRET: High-throughput analysis of freely diffusing molecules <br>
-> Ingargiola et al., PLOS ONE (2016), doi:[10.1371/journal.pone.0175766](https://doi.org/10.1371/journal.pone.0175766)
+> 48-spot single-molecule FRET setup with periodic acceptor excitation <br>
+> A. Ingargiola, M. Segal, A. Gulinatti, I. Rech, I. Labanca, P. Maccagnani, M. Ghioni, S. Weiss, X. Michalet <br>
+> *bioRxiv* 156182; **2017**. doi: https://doi.org/10.1101/156182
 
 # Authors
 
